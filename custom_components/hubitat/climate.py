@@ -9,6 +9,7 @@ from hubitatmaker import (
     CMD_COOL,
     CMD_ECO,
     CMD_FAN_AUTO,
+    CMD_FAN_CIRCULATE,
     CMD_FAN_ON,
     CMD_HEAT,
     CMD_OFF,
@@ -109,7 +110,8 @@ HASS_NEST_PRESET_MODES = [PRESET_HOME, PRESET_AWAY, PRESET_ECO, PRESET_AWAY_AND_
 FAN_MODE_ON = "on"
 FAN_MODE_AUTO = "auto"
 FAN_MODE_CIRCULATE = "circulate"
-HASS_FAN_MODES = [FAN_ON, FAN_AUTO]
+FAN_CIRCULATE = "Circulate"
+HASS_FAN_MODES = [FAN_ON, FAN_AUTO, FAN_CIRCULATE]
 
 
 class HubitatThermostat(HubitatEntity, ClimateEntity):
@@ -129,10 +131,12 @@ class HubitatThermostat(HubitatEntity, ClimateEntity):
     def fan_mode(self) -> Optional[str]:
         """Return the fan setting."""
         mode = self.get_str_attr(ATTR_FAN_MODE)
-        if mode == FAN_MODE_CIRCULATE or mode == FAN_MODE_ON:
+        if mode == FAN_MODE_ON:
             return FAN_ON
         if mode == FAN_MODE_AUTO:
             return FAN_AUTO
+        if mode == FAN_MODE_CIRCULATE:
+            return FAN_CIRCULATE
         return None
 
     @property
@@ -264,6 +268,8 @@ class HubitatThermostat(HubitatEntity, ClimateEntity):
             await self.send_command(CMD_FAN_ON)
         elif fan_mode == FAN_AUTO:
             await self.send_command(CMD_FAN_AUTO)
+        elif fan_mode == FAN_CIRCULATE:
+            await self.send_command(CMD_FAN_CIRCULATE)
 
     async def async_set_hvac_mode(self, hvac_mode: str) -> None:
         """Set new target hvac mode."""
