@@ -18,6 +18,13 @@ from hubitatmaker import (
     Device,
 )
 
+HOMESEER_FAN_SPEEDS = [
+    "off",
+    "low",
+    "medium-low",
+    "medium",
+    "high",
+]
 from homeassistant.components.fan import SUPPORT_SET_SPEED, FanEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -46,7 +53,8 @@ class HubitatFan(HubitatEntity, FanEntity):
     @property
     def speed_list(self) -> List[str]:
         """Return the list of speeds for this fan."""
-        return self._device.attributes[ATTR_SPEED].values or DEFAULT_FAN_SPEEDS
+        """return self._device.attributes[ATTR_SPEED].values or DEFAULT_FAN_SPEEDS"""
+        return HOMESEER_FAN_SPEEDS
 
     @property
     def unique_id(self) -> str:
