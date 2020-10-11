@@ -58,6 +58,7 @@ from .types import EntityAdder
 
 ATTR_COOLING_SETPOINT = "coolingSetpoint"
 ATTR_FAN_MODE = "thermostatFanMode"
+ATTR_FAN_STATE = "thermostatFanState"
 ATTR_HEATING_SETPOINT = "heatingSetpoint"
 ATTR_HUMIDITY = "humidity"
 ATTR_MODE = "thermostatMode"
@@ -110,9 +111,11 @@ HASS_NEST_PRESET_MODES = [PRESET_HOME, PRESET_AWAY, PRESET_ECO, PRESET_AWAY_AND_
 FAN_MODE_ON = "on"
 FAN_MODE_AUTO = "auto"
 FAN_MODE_CIRCULATE = "circulate"
-FAN_CIRCULATE = "Circulate"
+FAN_CIRCULATE = "circulate"
 HASS_FAN_MODES = [FAN_ON, FAN_AUTO, FAN_CIRCULATE]
 
+FAN_STATE_IDLE = "idle"
+FAN_STATE_RUNNING = "running"
 
 class HubitatThermostat(HubitatEntity, ClimateEntity):
     """Representation of a Hubitat switch."""
@@ -172,6 +175,11 @@ class HubitatThermostat(HubitatEntity, ClimateEntity):
         if opstate == OPSTATE_FAN_ONLY:
             return CURRENT_HVAC_FAN
         if opstate == OPSTATE_IDLE:
+            # Since fan state is not separately supported for thermostats, check for the
+            # fan running while the cool/heat are idle and report the state here
+            fanstate = self.get_str_attr(ATTR_FAN_STATE)
+            if fanstate == FAN_STATE_RUNNING:
+                return CURRENT_HVAC_FAN
             return CURRENT_HVAC_IDLE
         return None
 
